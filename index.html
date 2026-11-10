@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timothy's iPad System</title>
+
+<style>
+body{
+    font-family:Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    margin:0;
+}
+
+#loginScreen,
+#mainScreen{
+    margin-top:80px;
+}
+
+input{
+    padding:10px;
+    font-size:18px;
+    border-radius:8px;
+    border:none;
+}
+
+button{
+    padding:10px 20px;
+    font-size:18px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    margin:5px;
+}
+
+.nav button{
+    background:#2563eb;
+    color:white;
+}
+
+.tab{
+    display:none;
+    margin-top:25px;
+}
+
+#calcDisplay{
+    width:260px;
+    height:50px;
+    font-size:24px;
+    text-align:right;
+    margin-bottom:10px;
+}
+
+#calculator button{
+    width:60px;
+    height:60px;
+}
+
+textarea{
+    width:80%;
+    max-width:800px;
+    height:350px;
+    border-radius:10px;
+    padding:15px;
+    font-size:16px;
+    resize:vertical;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loginScreen">
+
+    <h1>Please put in the passcode for Timothy's iPad System</h1>
+
+    <input
+        type="password"
+        id="passcode"
+        placeholder="Enter Passcode">
+
+    <button onclick="login()">Enter</button>
+
+    <p id="error"></p>
+
+</div>
+
+<div id="mainScreen" style="display:none;">
+
+    <h1>Welcome Timothy!</h1>
+
+    <div class="nav">
+        <button onclick="showTab('calculator')">🧮 Calculator</button>
+        <button onclick="showTab('philippinesTime')">🕒 Philippines Time</button>
+        <button onclick="showTab('notes')">📝 Notes</button>
+    </div>
+
+    <!-- Calculator -->
+
+    <div id="calculator" class="tab">
+
+        <h2>Calculator</h2>
+
+        <input id="calcDisplay" readonly>
+
+        <br>
+
+        <button onclick="add('7')">7</button>
+        <button onclick="add('8')">8</button>
+        <button onclick="add('9')">9</button>
+        <button onclick="add('/')">÷</button>
+
+        <br>
+
+        <button onclick="add('4')">4</button>
+        <button onclick="add('5')">5</button>
+        <button onclick="add('6')">6</button>
+        <button onclick="add('*')">×</button>
+
+        <br>
+
+        <button onclick="add('1')">1</button>
+        <button onclick="add('2')">2</button>
+        <button onclick="add('3')">3</button>
+        <button onclick="add('-')">−</button>
+
+        <br>
+
+        <button onclick="add('0')">0</button>
+        <button onclick="add('.')">.</button>
+        <button onclick="calculate()">=</button>
+        <button onclick="add('+')">+</button>
+
+        <br><br>
+
+        <button onclick="clearCalc()">Clear</button>
+
+    </div>
+
+    <!-- Philippines Time -->
+
+    <div id="philippinesTime" class="tab">
+
+        <h2>Current Philippines Time</h2>
+
+        <h1 id="time"></h1>
+
+    </div>
+
+    <!-- Notes -->
+
+    <div id="notes" class="tab">
+
+        <h2>Notes</h2>
+
+        <p>Your notes automatically save.</p>
+
+        <textarea
+            id="notesBox"
+            placeholder="Write your notes here..."></textarea>
+
+        <br><br>
+
+        <button onclick="clearNotes()">
+            Clear Notes
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+// LOGIN
+
+function login(){
+
+    const code = document.getElementById("passcode").value;
+
+    if(code === "071582"){
+
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainScreen").style.display = "block";
+
+        showTab("calculator");
+
+    }
+    else{
+
+        document.getElementById("error").innerText =
+        "Incorrect Passcode!";
+
+    }
+}
+
+// TABS
+
+function showTab(tabId){
+
+    const tabs = document.querySelectorAll(".tab");
+
+    tabs.forEach(tab => {
+        tab.style.display = "none";
+    });
+
+    document.getElementById(tabId).style.display = "block";
+
+}
+
+// CALCULATOR
+
+function add(value){
+
+    document.getElementById("calcDisplay").value += value;
+
+}
+
+function clearCalc(){
+
+    document.getElementById("calcDisplay").value = "";
+
+}
+
+function calculate(){
+
+    try{
+
+        document.getElementById("calcDisplay").value =
+            eval(document.getElementById("calcDisplay").value);
+
+    }
+    catch{
+
+        alert("Invalid calculation");
+
+    }
+
+}
+
+// PHILIPPINES CLOCK
+
+function updatePHTime(){
+
+    const now = new Date();
+
+    const options = {
+        timeZone: "Asia/Manila",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    };
+
+    document.getElementById("time").innerText =
+        new Intl.DateTimeFormat("en-PH", options).format(now);
+
+}
+
+setInterval(updatePHTime, 1000);
+
+updatePHTime();
+
+// NOTES
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const notesBox = document.getElementById("notesBox");
+
+    const savedNotes =
+        localStorage.getItem("timothyNotes");
+
+    if(savedNotes){
+
+        notesBox.value = savedNotes;
+
+    }
+
+    notesBox.addEventListener("input", () => {
+
+        localStorage.setItem(
+            "timothyNotes",
+            notesBox.value
+        );
+
+    });
+
+});
+
+function clearNotes(){
+
+    if(confirm("Are you sure you want to delete all notes?")){
+
+        document.getElementById("notesBox").value = "";
+
+        localStorage.removeItem(
+            "timothyNotes"
+        );
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
